@@ -1,10 +1,7 @@
-import { useContext } from "react";
 import { BiRefresh } from "react-icons/bi";
-import { CardsContext } from "../context/CardsContext";
 import { FiTrash2 } from "react-icons/fi";
 
-function LocationCard({ card }) {
-  const { refreshCard, deleteCard } = useContext(CardsContext);
+function LocationCard({ card, refreshCard, deleteCard }) {
   const { zip, country, details, loading, error, lastUpdated } = card;
 
   return (

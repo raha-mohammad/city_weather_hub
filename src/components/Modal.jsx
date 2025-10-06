@@ -1,13 +1,12 @@
-import React, {
+import  {
   forwardRef,
   useImperativeHandle,
   useRef,
   useState,
 } from "react";
-import { useContext } from "react";
 import { createPortal } from "react-dom";
 import { FaSpinner } from "react-icons/fa6";
-import { CardsContext } from "../context/CardsContext";
+import { fetchLocationDetails } from "./commonLogic";
 const API_KEY = import.meta.env.VITE_API_KEY;
 
 const zipRegexMap = {
@@ -20,12 +19,11 @@ const initialFormState = {
   country: "in",
   error: "",
 };
-const Modal = forwardRef(function Modal(_, ref) {
+const Modal = forwardRef(function Modal({ addLocation, cards }, ref) {
   const dialogRef = useRef(null);
   const zipRef = useRef(null);
   const [submitting, setSubmitting] = useState(false);
   const [formState, setFormState] = useState(initialFormState);
-  const { addLocation, cards } = useContext(CardsContext);
 
   useImperativeHandle(ref, () => ({
     open: () => {
@@ -64,25 +62,21 @@ const Modal = forwardRef(function Modal(_, ref) {
 
     setSubmitting(true);
     try {
-      const ZIP_CODE_URL = `http://api.openweathermap.org/geo/1.0/zip?zip=${formState.zipCode},${formState.country}&appid=${API_KEY}`;
-      const zipCodeRes = await fetch(ZIP_CODE_URL);
-
-      if (!zipCodeRes.ok) {
-        throw new Error("No such zip code exists, Recheck your zip code. ");
-      }
-
-      const data = await zipCodeRes.json();
+      const details = await fetchLocationDetails(
+        formState.zipCode,
+        formState.country
+      );
       addLocation({
         zip: formState.zipCode.trim(),
         country: formState.country,
-        data,
+        details,
       });
       dialogRef.current.close();
     } catch (err) {
       console.error(err);
       setFormState((prevState) => ({
         ...prevState,
-        error: err.message || "Error while submitting details",
+        error: err.message || "Unable to fetch weather details ",
       }));
     } finally {
       setSubmitting(false);

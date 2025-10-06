@@ -1,21 +1,32 @@
 import { useEffect, useRef, useState } from "react";
-import { saveOrUpdateLocWeather } from "./components/commonLogic.js";
+import { fetchLocationDetails } from "./components/commonLogic.js";
 import Cards from "./components/Cards";
 import Modal from "./components/Modal";
 import Header from "./components/Header";
-import { CardsContext } from "./context/CardsContext.js";
+import { v4 as uuid4 } from "uuid";
+import AddLocationBtn from "./components/AddLocationBtn.jsx";
 
 const storedCards = JSON.parse(localStorage.getItem("myCards")) || [];
 
 export default function App() {
   const modalRef = useRef(null);
   const [cards, setCards] = useState(storedCards);
+  const maxCards = 10;
   useEffect(() => {
     localStorage.setItem("myCards", JSON.stringify(cards));
   }, [cards]);
 
-  function addLocation({ zip, country, data }) {
-    saveOrUpdateLocWeather({ zip, country, data, setCards });
+  function addLocation({ zip, country, details }) {
+    let newCard = {
+      id: uuid4(),
+      zip,
+      country,
+      details,
+      loading: false,
+      error: null,
+      lastUpdated: new Date().toLocaleTimeString(),
+    };
+    setCards((prevCards) => [newCard, ...prevCards]);
   }
 
   function deleteCard(card) {
@@ -27,59 +38,90 @@ export default function App() {
     }
   }
 
-  function refreshCard(card) {
-    const { zip, country, data } = card;
-    saveOrUpdateLocWeather({
-      zip,
-      country,
-      data,
-      existingCard: card,
-      setCards,
-    });
+  async function refreshCard(card) {
+    const loadingCard = {
+      ...card,
+      details: null,
+      loading: true,
+      error: null,
+      lastUpdated: null,
+    };
+    setCards((prevCards) =>
+      prevCards.map((eachCard) =>
+        card.id === eachCard.id ? loadingCard : eachCard
+      )
+    );
+
+    try {
+      const details = await fetchLocationDetails(card.zip, card.country);
+      console.log("refreshed", details);
+      setCards((prevCards) =>
+        prevCards.map((eachCard) =>
+          card.id === eachCard.id
+            ? {
+                ...card,
+                loading: false,
+                error: null,
+                details,
+                lastUpdated: new Date().toLocaleTimeString(),
+              }
+            : eachCard
+        )
+      );
+    } catch (err) {
+      setCards((prevCards) =>
+        prevCards.map((eachCard) =>
+          card.id === eachCard.id
+            ? {
+                ...card,
+                loading: false,
+                details: null,
+                lastUpdated: null,
+                error: err.message || "Unable to fetch weather details ",
+              }
+            : eachCard
+        )
+      );
+    }
   }
-  const contextValue = {
-    cards,
-    addLocation,
-    refreshCard,
-    deleteCard,
-  };
 
   return (
     <div className="min-h-screen bg-slate-900 text-white">
       <Header />
-      <CardsContext.Provider value={contextValue}>
-        <main className="max-w-6xl mx-auto px-8 py-8 space-y-6 ">
-          {cards.length === 0 && (
-            <div className="min-h-[80vh] flex flex-col items-center justify-center">
-              <p className="mb-6 text-lg opacity-90">
-                No locations yet — add one to get started.
-              </p>
+      <main className="max-w-6xl mx-auto px-8 py-8 space-y-6 ">
+        {cards.length === 0 && (
+          <div className="min-h-[80vh] flex flex-col items-center justify-center">
+            <p className="mb-6 text-lg opacity-90">
+              No locations yet — add one to get started.
+            </p>
 
-              <button
-                onClick={() => modalRef.current.open()}
-                className=" text-white font-semibold   px-4 py-3 rounded-lg bg-amber-600 hover:bg-amber-500 focus:outline-none  cursor-pointer  shadow-lg"
-              >
-                Add Location
-              </button>
-            </div>
-          )}
-
-          <Cards />
-        </main>
-
-        {cards.length > 0 && (
-          <button
-            onClick={() => modalRef.current.open()}
-            className="fixed text-white font-semibold bottom-6 right-6 z-50 px-4 py-3 rounded-lg cursor-pointer bg-amber-600 hover:bg-amber-500 focus:outline-none   shadow-lg "
-            title="Add Location"
-            aria-label="Add Location"
-          >
-            Add Location
-          </button>
+            <AddLocationBtn ref={modalRef} />
+          </div>
         )}
 
-        <Modal ref={modalRef} />
-      </CardsContext.Provider>
+        <Cards>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-20">
+            {cards.map((card) => (
+              <LocationCard
+                key={card.id}
+                card={card}
+                refreshCard={refreshCard}
+                deleteCard={deleteCard}
+              />
+            ))}
+          </div>
+        </Cards>
+      </main>
+
+      {cards.length > 0 && (
+        <AddLocationBtn
+          ref={modalRef}
+          disabled={cards.length === maxCards}
+          cssClasses="fixed bottom-6 right-6  z-50 "
+        />
+      )}
+
+      <Modal ref={modalRef} addLocation={addLocation} cards={cards} />
     </div>
   );
 }
