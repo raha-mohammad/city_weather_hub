@@ -17,7 +17,7 @@ const AddLocationBtn = forwardRef(function AddLocationBtn(
   return (
     <button
       onClick={handleClick}
-      className={` text-white font-semibold  px-4 py-3 rounded-lg cursor-pointer bg-amber-600 hover:bg-amber-500 focus:outline-none shadow-lg  ${cssClasses}`}
+      className={` text-white font-semibold  px-4 py-3 rounded-lg cursor-pointer bg-amber-600 hover:bg-amber-500 focus:outline-none shadow-lg ${cssClasses}`}
     >
       Add Location
     </button>

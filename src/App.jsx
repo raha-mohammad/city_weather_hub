@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { fetchLocationDetails } from "./components/commonLogic.js";
-import Cards from "./components/Cards";
 import Modal from "./components/Modal";
 import Header from "./components/Header";
 import { v4 as uuid4 } from "uuid";
 import AddLocationBtn from "./components/AddLocationBtn.jsx";
+import LocationCard from "./components/Card.jsx";
 
 const storedCards = JSON.parse(localStorage.getItem("myCards")) || [];
 
@@ -99,18 +99,16 @@ export default function App() {
           </div>
         )}
 
-        <Cards>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-20">
-            {cards.map((card) => (
-              <LocationCard
-                key={card.id}
-                card={card}
-                refreshCard={refreshCard}
-                deleteCard={deleteCard}
-              />
-            ))}
-          </div>
-        </Cards>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-20">
+          {cards.map((card) => (
+            <LocationCard
+              key={card.id}
+              card={card}
+              refreshCard={refreshCard}
+              deleteCard={deleteCard}
+            />
+          ))}
+        </div>
       </main>
 
       {cards.length > 0 && (
