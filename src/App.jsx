@@ -54,7 +54,6 @@ export default function App() {
 
     try {
       const details = await fetchLocationDetails(card.zip, card.country);
-      console.log("refreshed", details);
       setCards((prevCards) =>
         prevCards.map((eachCard) =>
           card.id === eachCard.id
