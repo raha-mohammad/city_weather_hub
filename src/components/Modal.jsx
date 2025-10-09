@@ -15,7 +15,6 @@ const initialFormState = {
 };
 const Modal = forwardRef(function Modal({ addLocation, cards }, ref) {
   const dialogRef = useRef(null);
-  // const zipRef = useRef(null);
   const [submitting, setSubmitting] = useState(false);
   const [formState, setFormState] = useState(initialFormState);
 
@@ -23,10 +22,6 @@ const Modal = forwardRef(function Modal({ addLocation, cards }, ref) {
     open: () => {
       setFormState(initialFormState);
       dialogRef.current.showModal();
-      // setTimeout(() => zipRef.current.focus(), 100);
-    },
-    close: () => {
-      dialogRef.current.close();
     },
   }));
 
@@ -43,7 +38,7 @@ const Modal = forwardRef(function Modal({ addLocation, cards }, ref) {
       return;
     }
 
-    if (cards.some((card) => card.zip === formState.zipCode)) {
+    if (cards.some((card) => card.zip === formState.zipCode.trim())) {
       setFormState((prevState) => ({
         ...prevState,
         error:
@@ -92,8 +87,6 @@ const Modal = forwardRef(function Modal({ addLocation, cards }, ref) {
           <input
             id="zipCode"
             name="zipCode"
-            // ref={zipRef}
-            // autoFocus
             value={formState.zipCode}
             onChange={(e) => {
               setFormState((prevState) => ({
@@ -116,8 +109,6 @@ const Modal = forwardRef(function Modal({ addLocation, cards }, ref) {
             id="country"
             name="country"
             value={formState.country}
-            // title="Read Only"
-            // readonly
             disabled
             className="w-full px-4 py-2 rounded-md bg-gray-700 border border-gray-600 focus:outline-none  mb-4"
           >

@@ -1,9 +1,8 @@
-import { forwardRef } from "react";
-
-const AddLocationBtn = forwardRef(function AddLocationBtn(
-  { cssClasses = "", disabled = false },
-  modalRef
-) {
+const AddLocationBtn = function AddLocationBtn({
+  cssClasses = "",
+  disabled = false,
+  openModal,
+}) {
   function handleClick() {
     if (disabled) {
       alert(
@@ -11,7 +10,7 @@ const AddLocationBtn = forwardRef(function AddLocationBtn(
       );
       return;
     }
-    modalRef.current.open();
+    openModal();
   }
 
   return (
@@ -22,6 +21,6 @@ const AddLocationBtn = forwardRef(function AddLocationBtn(
       Add Location
     </button>
   );
-});
+};
 
 export default AddLocationBtn;

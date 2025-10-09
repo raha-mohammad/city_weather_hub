@@ -2,13 +2,13 @@ import { BiRefresh } from "react-icons/bi";
 import { FiTrash2 } from "react-icons/fi";
 
 function LocationCard({ card, refreshCard, deleteCard }) {
-  const { zip, country, details, loading, error } = card;
+  const { id, zip, country, details, loading, error } = card;
 
   return (
     <div className="bg-white  rounded-lg shadow-md p-4 relative  hover:bg-blue-100">
       <div className=" absolute top-3 right-3 flex items-center justify-center ">
         <button
-          onClick={() => deleteCard(card)}
+          onClick={() => deleteCard(id)}
           className="p-1  rounded-md bg-gray-200 hover:bg-red-200"
           title="Delete"
           disabled={loading}

@@ -8,28 +8,46 @@ import LocationCard from "./components/Card.jsx";
 
 const storedCards = JSON.parse(localStorage.getItem("myCards")) || [];
 
+const loadingStatecards = storedCards.map((eachCard) => ({
+  ...eachCard,
+  details: null,
+  loading: true,
+  error: null,
+}));
+
 export default function App() {
   const modalRef = useRef(null);
-  const [cards, setCards] = useState(storedCards);
+  const [cards, setCards] = useState(loadingStatecards);
 
-  // useEffect(() => {
-  //   async function fetchDetails(card) {
-  //     const { zip, country } = card;
-  //     const details = await fetchLocationDetails(zip, country);
-  //     return details;
-  //   }
+  useEffect(() => {
+    async function fetchDetails() {
+      const succesOrFailureCards = await Promise.all(
+        //Promise.all() resolves after all are done and gives an array of their results in order,all promises run in parallel
+        storedCards.map(async (card) => {
+          try {
+            const details = await fetchLocationDetails(card.zip, card.country);
+            return {
+              ...card,
+              loading: false,
+              error: null,
+              details,
+            };
+          } catch (err) {
+            return {
+              ...card,
+              loading: false,
+              details: null,
+              error: err.message || "Unable to fetch weather details ",
+            };
+          }
+        })
+      );
 
-  //   setCards(
-  //     storedCards.map(async (eachCard) => {
-  //       const data = await fetchDetails(eachCard);
+      setCards(succesOrFailureCards);
+    }
 
-  //       return {
-  //         ...eachCard,
-  //         details: data,
-  //       };
-  //     })
-  //   );
-  // }, []);
+    fetchDetails();
+  }, []);
 
   const maxCards = 10;
   useEffect(() => {
@@ -48,11 +66,11 @@ export default function App() {
     setCards((prevCards) => [newCard, ...prevCards]);
   }
 
-  function deleteCard(card) {
+  function deleteCard(id) {
     const result = window.confirm("confirm delete?");
     if (result) {
       setCards((prevCards) =>
-        prevCards.filter((eachCard) => eachCard.id !== card.id)
+        prevCards.filter((eachCard) => eachCard.id !== id)
       );
     }
   }
@@ -110,7 +128,7 @@ export default function App() {
               No locations yet — add one to get started.
             </p>
 
-            <AddLocationBtn ref={modalRef} />
+            <AddLocationBtn openModal={() => modalRef.current.open()} />
           </div>
         )}
 
@@ -128,7 +146,7 @@ export default function App() {
 
       {cards.length > 0 && (
         <AddLocationBtn
-          ref={modalRef}
+          openModal={() => modalRef.current.open()}
           disabled={cards.length === maxCards}
           cssClasses="fixed bottom-6 right-6  z-50 "
         />
