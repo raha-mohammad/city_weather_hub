@@ -11,6 +11,26 @@ const storedCards = JSON.parse(localStorage.getItem("myCards")) || [];
 export default function App() {
   const modalRef = useRef(null);
   const [cards, setCards] = useState(storedCards);
+
+  // useEffect(() => {
+  //   async function fetchDetails(card) {
+  //     const { zip, country } = card;
+  //     const details = await fetchLocationDetails(zip, country);
+  //     return details;
+  //   }
+
+  //   setCards(
+  //     storedCards.map(async (eachCard) => {
+  //       const data = await fetchDetails(eachCard);
+
+  //       return {
+  //         ...eachCard,
+  //         details: data,
+  //       };
+  //     })
+  //   );
+  // }, []);
+
   const maxCards = 10;
   useEffect(() => {
     localStorage.setItem("myCards", JSON.stringify(cards));
@@ -24,7 +44,6 @@ export default function App() {
       details,
       loading: false,
       error: null,
-      lastUpdated: new Date().toLocaleTimeString(),
     };
     setCards((prevCards) => [newCard, ...prevCards]);
   }
@@ -44,7 +63,6 @@ export default function App() {
       details: null,
       loading: true,
       error: null,
-      lastUpdated: null,
     };
     setCards((prevCards) =>
       prevCards.map((eachCard) =>
@@ -62,7 +80,6 @@ export default function App() {
                 loading: false,
                 error: null,
                 details,
-                lastUpdated: new Date().toLocaleTimeString(),
               }
             : eachCard
         )
@@ -75,7 +92,6 @@ export default function App() {
                 ...card,
                 loading: false,
                 details: null,
-                lastUpdated: null,
                 error: err.message || "Unable to fetch weather details ",
               }
             : eachCard

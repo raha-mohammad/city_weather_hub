@@ -23,6 +23,7 @@ export async function fetchLocationDetails(zipCode, country) {
       humidity: weatherData.main.humidity,
       feelsLike: weatherData.main.feels_like,
       weatherDescription: weatherData.weather[0].description,
+      lastUpdated: new Date().toLocaleTimeString(),
     };
   } catch (err) {
     if (err.name === "TypeError") {

@@ -2,7 +2,7 @@ import { BiRefresh } from "react-icons/bi";
 import { FiTrash2 } from "react-icons/fi";
 
 function LocationCard({ card, refreshCard, deleteCard }) {
-  const { zip, country, details, loading, error, lastUpdated } = card;
+  const { zip, country, details, loading, error } = card;
 
   return (
     <div className="bg-white  rounded-lg shadow-md p-4 relative  hover:bg-blue-100">
@@ -58,7 +58,7 @@ function LocationCard({ card, refreshCard, deleteCard }) {
         <div className=" absolute bottom-3 right-3 flex items-center justify-center ">
           {!loading && !error && (
             <p className=" mr-1 text-sm font-medium text-gray-500">
-              Last updated: {lastUpdated}
+              Last updated: {details.lastUpdated}
             </p>
           )}
 

@@ -1,13 +1,7 @@
-import  {
-  forwardRef,
-  useImperativeHandle,
-  useRef,
-  useState,
-} from "react";
+import { forwardRef, useImperativeHandle, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { FaSpinner } from "react-icons/fa6";
 import { fetchLocationDetails } from "./commonLogic";
-const API_KEY = import.meta.env.VITE_API_KEY;
 
 const zipRegexMap = {
   in: /^\d{6}$/, // India 6 digits
@@ -21,7 +15,7 @@ const initialFormState = {
 };
 const Modal = forwardRef(function Modal({ addLocation, cards }, ref) {
   const dialogRef = useRef(null);
-  const zipRef = useRef(null);
+  // const zipRef = useRef(null);
   const [submitting, setSubmitting] = useState(false);
   const [formState, setFormState] = useState(initialFormState);
 
@@ -29,7 +23,7 @@ const Modal = forwardRef(function Modal({ addLocation, cards }, ref) {
     open: () => {
       setFormState(initialFormState);
       dialogRef.current.showModal();
-      setTimeout(() => zipRef.current.focus(), 100);
+      // setTimeout(() => zipRef.current.focus(), 100);
     },
     close: () => {
       dialogRef.current.close();
@@ -49,15 +43,13 @@ const Modal = forwardRef(function Modal({ addLocation, cards }, ref) {
       return;
     }
 
-    if (cards) {
-      if (cards.some((card) => card.zip === formState.zipCode)) {
-        setFormState((prevState) => ({
-          ...prevState,
-          error:
-            "Weather details already exists for this zipCode, Try refreshing for updated weather. ",
-        }));
-        return;
-      }
+    if (cards.some((card) => card.zip === formState.zipCode)) {
+      setFormState((prevState) => ({
+        ...prevState,
+        error:
+          "Weather details already exists for this zipCode, Try refreshing for updated weather. ",
+      }));
+      return;
     }
 
     setSubmitting(true);
@@ -100,7 +92,8 @@ const Modal = forwardRef(function Modal({ addLocation, cards }, ref) {
           <input
             id="zipCode"
             name="zipCode"
-            ref={zipRef}
+            // ref={zipRef}
+            // autoFocus
             value={formState.zipCode}
             onChange={(e) => {
               setFormState((prevState) => ({
@@ -123,7 +116,8 @@ const Modal = forwardRef(function Modal({ addLocation, cards }, ref) {
             id="country"
             name="country"
             value={formState.country}
-            title="Read Only"
+            // title="Read Only"
+            // readonly
             disabled
             className="w-full px-4 py-2 rounded-md bg-gray-700 border border-gray-600 focus:outline-none  mb-4"
           >
